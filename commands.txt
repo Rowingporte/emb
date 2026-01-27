@@ -59,3 +59,15 @@ mknode make node
 
 
 arnoremypaulgabin
+
+
+
+mount -t proc proc /proc
+
+mount -t sysfs sysfs /sys
+
+ls /sys
+
+ls -l /dev/gpiochip*
+
+gpiodetect
