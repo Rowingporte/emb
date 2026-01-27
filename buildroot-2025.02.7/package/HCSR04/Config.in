@@ -1,0 +1,5 @@
+config BR2_PACKAGE_HCSR04
+    bool "HCSR04"
+    depends on BR2_LINUX_KERNEL
+    help
+      Package pour le capteur HCSR04.

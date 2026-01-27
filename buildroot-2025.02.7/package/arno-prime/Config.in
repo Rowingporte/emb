@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ARNO_PRIME
+    bool "arno-prime"
+    depends on BR2_LINUX_KERNEL
+    help
+      C'est Arno Prime.

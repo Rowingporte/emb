@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesure HC-SR04</title>
+    
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #f0f6fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            background: #161b22;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid #30363d;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #8b949e;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        
+        .value-container {
+            margin-bottom: 20px;
+        }
+
+        #dist-val {
+            font-size: 8rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 2rem;
+            color: #58a6ff;
+            margin-left: 10px;
+        }
+
+  
+        .gauge-track {
+            height: 40px;
+            width: 100%;
+            background: #010409;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #30363d;
+            position: relative;
+        }
+
+        #gauge-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #58a6ff, #00d4ff);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+            transition: width 0.3s ease-out, background 0.3s ease;
+        }
+
+       
+        .alert-text {
+            margin-top: 20px;
+            font-weight: bold;
+            height: 24px;
+            color: #ff7b72;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Distance HC-SR04</h1>
+
+        <div class="value-container">
+            <span id="dist-val">--</span><span class="unit">cm</span>
+        </div>
+
+        <div class="gauge-track">
+            <div id="gauge-bar"></div>
+        </div>
+
+        <div id="alert" class="alert-text">ATTENTION : TROP PROCHE !</div>
+    </div>
+
+    <script>
+        function fetchDistance() {
+            fetch("{% url 'data' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const dist = parseFloat(data.dist1);
+                    const valElement = document.getElementById('dist-val');
+                    const bar = document.getElementById('gauge-bar');
+                    const alertMsg = document.getElementById('alert');
+
+                    
+                    valElement.innerText = Math.round(dist);
+
+                   
+                    let percent = (dist / 150) * 100;
+                    percent = Math.min(Math.max(percent, 0), 100);
+                    bar.style.width = percent + "%";
+
+                    
+                    if (dist < 20) {
+                        bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
+                        bar.style.boxShadow = "0 0 20px rgba(248, 81, 73, 0.6)";
+                        alertMsg.style.visibility = "visible";
+                    } else if (dist < 50) {
+                        bar.style.background = "linear-gradient(90deg, #d29922, #e3b341)";
+                        bar.style.boxShadow = "none";
+                        alertMsg.style.visibility = "hidden";
+                    } else {
+                        bar.style.background = "linear-gradient(90deg, #58a6ff, #00d4ff)";
+                        bar.style.boxShadow = "0 0 20px rgba(88, 166, 255, 0.4)";
+                        alertMsg.style.visibility = "hidden";
+                    }
+                })
+                .catch(err => {
+                    console.error("Erreur de liaison Ethernet :", err);
+                    document.getElementById('dist-val').innerText = "??";
+                });
+        }
+
+        
+        setInterval(fetchDistance, 250);
+        
+        
+        window.onload = fetchDistance;
+    </script>
+</body>
+</html>
