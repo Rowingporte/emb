@@ -71,3 +71,22 @@ ls /sys
 ls -l /dev/gpiochip*
 
 gpiodetect
+
+1. Create the etc directory in your overlay
+On your host machine (the T14), run:
+
+Bash
+mkdir -p ~/insa/4A/emb/buildroot-2025.02.7/board/stmicroelectronics/stm32mp157c-dk2/overlay/etc
+2. Create the new fstab file
+Now, create the file:
+
+Bash
+nano ~/insa/4A/emb/buildroot-2025.02.7/board/stmicroelectronics/stm32mp157c-dk2/overlay/etc/fstab
+Paste this exact content:
+
+Plaintext
+# <file system> <mount point> <type>  <options> <dump> <pass>
+/dev/root       /             auto    rw            0    1
+proc            /proc         proc    defaults      0    0
+sysfs           /sys          sysfs   defaults      0    0
+devtmpfs        /dev          devtmpfs defaults     0    0
