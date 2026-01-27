@@ -1,0 +1,61 @@
+sudo umount /dev/sda* ; sudo dd if=/home/arno/insa/4A/SEE/buildroot-2025.02.7/output/images/sdcard.img of=/dev/sdb bs=16M oflag=sync
+sync pour etre sur quand unmount clé
+
+sudo picocom /dev/ttyACM0 -b 115200 pour se connecter à la board
+
+readlink -f output/images/sdcard.img pour avoir le pwd
+du -sh
+df -h pour avoir la taille de du DD
+lsblk pour lister les disks
+
+ifconfig down
+ipconfig up
+then ifconfig eth0 
+
+cat cmdline => init
+cat stat 1 (init) S 0 1 1 0 -1 4194560 46 2907 19 5 0 159 16 17 20 0 1 0 0 2871296 352 4294967295 4849664 5712752 3202203376 0 0 0 0 0 524288 1 0 0 17 0 0 0 0 0 0 5716080 5722429 5726208 3202203604 3202203615 3202203615 3202203633 0
+donc S = Sleeping
+cat environ HOME=/TERM=linux
+cat /proc/cpuinfo ARMv7 Processor rev 5
+
+1. Kill any hung dhcpcd processes
+
+Bash
+killall dhcpcd
+2. Start dhcpcd in the foreground (to see the errors) Running it with -f (foreground) and -d (debug) will show us exactly why it's not getting an IP.
+
+Bash
+dhcpcd -f eth0
+3. If that fails, try the BusyBox alternative Many STM32/embedded builds use udhcpc instead of dhcpcd. If dhcpcd keeps stalling, try:
+
+Bash
+udhcpc -i eth0
+
+
+GPIO's:
+
+50002000 -> 540043ff
+
+50002000-500023ff : soc:pinctrl@50002000 gpio@50002000
+50003000-500033ff : soc:pinctrl@50002000 gpio@50003000
+50004000-500043ff : soc:pinctrl@50002000 gpio@50004000
+50005000-500053ff : soc:pinctrl@50002000 gpio@50005000
+50006000-500063ff : soc:pinctrl@50002000 gpio@50006000
+50007000-500073ff : soc:pinctrl@50002000 gpio@50007000
+50008000-500083ff : soc:pinctrl@50002000 gpio@50008000
+50009000-500093ff : soc:pinctrl@50002000 gpio@50009000
+5000a000-5000a3ff : soc:pinctrl@50002000 gpio@5000a000
+54004000-540043ff : soc:pinctrl@54004000 gpio@54004000
+
+taille de la mémoire ram 509384 kB
+
+cmdline contient le nom de la commande pour lancer le Processor
+
+[13736.338021] Init dummy module
+
+IL FAUT METTRE LES FILES DANS LE PACKAGE HELLOWORLD
+
+mknode make node 
+
+
+arnoremypaulgabin
