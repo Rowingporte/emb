@@ -1,4 +1,9 @@
 obj-m += HCSR04.o
 
+KDIR ?= /lib/modules/$(shell uname -r)/build
+
 all:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
+
+clean:
+	$(MAKE) -C $(KDIR) M=$(PWD) clean

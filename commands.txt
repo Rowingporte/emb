@@ -18,18 +18,7 @@ donc S = Sleeping
 cat environ HOME=/TERM=linux
 cat /proc/cpuinfo ARMv7 Processor rev 5
 
-1. Kill any hung dhcpcd processes
 
-Bash
-killall dhcpcd
-2. Start dhcpcd in the foreground (to see the errors) Running it with -f (foreground) and -d (debug) will show us exactly why it's not getting an IP.
-
-Bash
-dhcpcd -f eth0
-3. If that fails, try the BusyBox alternative Many STM32/embedded builds use udhcpc instead of dhcpcd. If dhcpcd keeps stalling, try:
-
-Bash
-udhcpc -i eth0
 
 
 GPIO's:
@@ -71,6 +60,29 @@ ls /sys
 ls -l /dev/gpiochip*
 
 gpiodetect
+
+SSH FIX
+
+killall dhcpcd
+dhcpcd -f eth0
+udhcpc -i eth0
+
+ssh-keygen -A
+/usr/sbin/sshd -D -e
+
+ssh-keygen -f '/home/arno/.ssh/known_hosts' -R '10.42.0.15'
+
+passwd root root
+
+modif vi /etc/ssh/sshd_config et #PermitRootLogin prohibit-password to PermitRootLogin yes pareil pour le #PasswordAuthentication yes en PasswordAuthentication yes
+
+pidof sshd
+
+# Kill it
+kill $(pidof sshd)
+
+
+LIBGPIO FIX
 
 1. Create the etc directory in your overlay
 On your host machine (the T14), run:
