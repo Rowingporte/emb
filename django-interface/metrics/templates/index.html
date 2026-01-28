@@ -104,41 +104,47 @@
 
     <script>
         function fetchDistance() {
-            fetch("{% url 'data' %}")
-                .then(response => response.json())
-                .then(data => {
-                    const dist = parseFloat(data.dist1);
-                    const valElement = document.getElementById('dist-val');
-                    const bar = document.getElementById('gauge-bar');
-                    const alertMsg = document.getElementById('alert');
+        fetch("{% url 'data' %}")
+            .then(response => response.json())
+            .then(data => {
+                const dist = parseFloat(data.dist1);
+                const valElement = document.getElementById('dist-val');
+                const bar = document.getElementById('gauge-bar');
+                const alertMsg = document.getElementById('alert');
 
-                    
-                    valElement.innerText = Math.round(dist);
+                valElement.innerText = Math.round(dist);
 
-                   
-                    let percent = (dist / 150) * 100;
-                    percent = Math.min(Math.max(percent, 0), 100);
-                    bar.style.width = percent + "%";
+                // --- INVERSION DE LA LOGIQUE ---
+                // Si dist = 0, percent = 100% (Barre pleine)
+                // Si dist = 150, percent = 0% (Barre vide)
+                let percent = 100 - ((dist / 150) * 100);
+                
+                // Sécurité pour rester entre 0 et 100
+                percent = Math.min(Math.max(percent, 0), 100);
+                bar.style.width = percent + "%";
 
-                    
-                    if (dist < 20) {
-                        bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
-                        bar.style.boxShadow = "0 0 20px rgba(248, 81, 73, 0.6)";
-                        alertMsg.style.visibility = "visible";
-                    } else if (dist < 50) {
-                        bar.style.background = "linear-gradient(90deg, #d29922, #e3b341)";
-                        bar.style.boxShadow = "none";
-                        alertMsg.style.visibility = "hidden";
-                    } else {
-                        bar.style.background = "linear-gradient(90deg, #58a6ff, #00d4ff)";
-                        bar.style.boxShadow = "0 0 20px rgba(88, 166, 255, 0.4)";
-                        alertMsg.style.visibility = "hidden";
-                    }
-                })
-                .catch(err => {
-                    console.error("Erreur de liaison Ethernet :", err);
-                    document.getElementById('dist-val').innerText = "??";
-                });
+                // --- COULEURS SELON LA PROXIMITÉ ---
+                if (dist < 20) {
+                    // Très proche : Rouge
+                    bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
+                    bar.style.boxShadow = "0 0 20px rgba(248, 81, 73, 0.6)";
+                    alertMsg.style.visibility = "visible";
+                } else if (dist < 80) {
+                    // Approche : Orange/Jaune
+                    bar.style.background = "linear-gradient(90deg, #d29922, #e3b341)";
+                    bar.style.boxShadow = "none";
+                    alertMsg.style.visibility = "hidden";
+                } else {
+                    // Loin : Bleu
+                    bar.style.background = "linear-gradient(90deg, #58a6ff, #00d4ff)";
+                    bar.style.boxShadow = "0 0 20px rgba(88, 166, 255, 0.4)";
+                    alertMsg.style.visibility = "hidden";
+                }
+            })
+            .catch(err => {
+                console.error("Erreur :", err);
+                document.getElementById('dist-val').innerText = "??";
+            });
         }
 
         

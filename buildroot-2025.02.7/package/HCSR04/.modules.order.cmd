@@ -1,1 +1,1 @@
-savedcmd_modules.order := {   echo HCSR04.o; :; } > modules.order
+savedcmd_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/modules.order := {   echo /home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o; :; } > /home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/modules.order

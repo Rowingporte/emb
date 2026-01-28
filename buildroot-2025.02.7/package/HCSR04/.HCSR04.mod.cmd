@@ -1,1 +1,1 @@
-savedcmd_HCSR04.mod := printf '%s\n'   HCSR04.o | awk '!x[$$0]++ { print("./"$$0) }' > HCSR04.mod
+savedcmd_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.mod := printf '%s\n'   HCSR04.o | awk '!x[$$0]++ { print("/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/"$$0) }' > /home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.mod
