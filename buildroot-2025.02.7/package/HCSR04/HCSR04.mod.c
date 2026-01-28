@@ -44,12 +44,10 @@ __used __section("__versions") = {
 	{ 0xf3a226b, "_dev_info" },
 	{ 0x2ab8e3ab, "_dev_err" },
 	{ 0x5ac19ccb, "platform_driver_unregister" },
-	{ 0x5f754e5a, "memset" },
 	{ 0xb7e3aff3, "gpiod_set_value" },
 	{ 0x8e865d3c, "arm_delay_ops" },
 	{ 0x1d4aae90, "gpiod_get_value" },
 	{ 0xb43f9365, "ktime_get" },
-	{ 0xa6a7a2ad, "div_s64_rem" },
 	{ 0x314b20c8, "scnprintf" },
 	{ 0x51a910c0, "arm_copy_to_user" },
 	{ 0x7682ba4e, "__copy_overflow" },
@@ -59,5 +57,5 @@ __used __section("__versions") = {
 
 MODULE_INFO(depends, "");
 
-MODULE_ALIAS("of:N*T*Cinsa,hcsr04");
-MODULE_ALIAS("of:N*T*Cinsa,hcsr04C*");
+MODULE_ALIAS("of:N*T*Chcsr04");
+MODULE_ALIAS("of:N*T*Chcsr04C*");

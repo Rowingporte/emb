@@ -29,29 +29,25 @@ static ssize_t hcsr04_read(struct file *file, char __user *buf, size_t count, lo
     struct hcsr04_data *data = file->private_data;
     ktime_t start, end;
     s64 delta_ns;
-    char response[32];
+    char response[24];
     int len;
 
     if (!data) return -ENODEV;
     if (*ppos > 0) return 0;
 
-    /* 1. Trigger pulse 10us */
     gpiod_set_value(data->trig_gpio, 1);
     udelay(10);
     gpiod_set_value(data->trig_gpio, 0);
 
-    /* 2. Polling Echo (Attente front montant) */
-    /* Attention : dans un vrai driver on ajouterait un timeout ici */
     while (gpiod_get_value(data->echo_gpio) == 0);
     start = ktime_get();
-
-    /* 3. Polling Echo (Attente front descendant) */
+    
     while (gpiod_get_value(data->echo_gpio) == 1);
     end = ktime_get();
 
-    /* 4. Calcul de la distance */
     delta_ns = ktime_to_ns(ktime_sub(end, start));
-    len = scnprintf(response, sizeof(response), "%lld cm\n", div_s64(delta_ns, 58000));
+
+    len = scnprintf(response, sizeof(response), "%lld\n", delta_ns);
 
     if (copy_to_user(buf, response, len)) return -EFAULT;
     
