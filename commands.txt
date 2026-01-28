@@ -102,3 +102,13 @@ Plaintext
 proc            /proc         proc    defaults      0    0
 sysfs           /sys          sysfs   defaults      0    0
 devtmpfs        /dev          devtmpfs defaults     0    0
+
+dts et mknode
+
+strings /boot/stm32mp157c-dk2.dtb | grep hcsr04
+hcsr04
+!hcsr04
+mknod /dev/hcsr04 c 245 0
+chmod 666 /dev/hcsr04
+
+scp output/images/stm32mp157c-dk2.dtb root@10.42.0.16:/boot/
