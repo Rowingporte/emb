@@ -803,21 +803,80 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
     $(wildcard include/config/ARM_DMA_USE_IOMMU) \
     $(wildcard include/config/ARCH_OMAP) \
   include/linux/pm_wakeup.h \
+  include/linux/interrupt.h \
+    $(wildcard include/config/IRQ_FORCED_THREADING) \
+    $(wildcard include/config/GENERIC_IRQ_PROBE) \
+    $(wildcard include/config/PROC_FS) \
+    $(wildcard include/config/IRQ_TIMINGS) \
+  include/linux/irqreturn.h \
+  include/linux/hardirq.h \
+  include/linux/context_tracking_state.h \
+    $(wildcard include/config/CONTEXT_TRACKING_USER) \
+    $(wildcard include/config/CONTEXT_TRACKING) \
+  include/linux/ftrace_irq.h \
+    $(wildcard include/config/HWLAT_TRACER) \
+    $(wildcard include/config/OSNOISE_TRACER) \
+  include/linux/vtime.h \
+    $(wildcard include/config/VIRT_CPU_ACCOUNTING) \
+    $(wildcard include/config/IRQ_TIME_ACCOUNTING) \
+  arch/arm/include/asm/hardirq.h \
+  arch/arm/include/asm/irq.h \
+    $(wildcard include/config/SPARSE_IRQ) \
+  include/asm-generic/hardirq.h \
+  include/linux/irq.h \
+    $(wildcard include/config/GENERIC_IRQ_EFFECTIVE_AFF_MASK) \
+    $(wildcard include/config/GENERIC_IRQ_IPI) \
+    $(wildcard include/config/IRQ_DOMAIN_HIERARCHY) \
+    $(wildcard include/config/DEPRECATED_IRQ_CPU_ONOFFLINE) \
+    $(wildcard include/config/GENERIC_IRQ_MIGRATION) \
+    $(wildcard include/config/GENERIC_PENDING_IRQ) \
+    $(wildcard include/config/HARDIRQS_SW_RESEND) \
+    $(wildcard include/config/GENERIC_IRQ_LEGACY) \
+    $(wildcard include/config/GENERIC_IRQ_MULTI_HANDLER) \
+  include/linux/irqhandler.h \
+  include/linux/io.h \
+    $(wildcard include/config/HAS_IOPORT_MAP) \
+    $(wildcard include/config/PCI) \
+  arch/arm/include/asm/io.h \
+    $(wildcard include/config/PCMCIA) \
+    $(wildcard include/config/NEED_MACH_IO_H) \
+  include/asm-generic/pci_iomap.h \
+    $(wildcard include/config/NO_GENERIC_PCI_IOPORT_MAP) \
+    $(wildcard include/config/GENERIC_PCI_IOMAP) \
+  include/asm-generic/io.h \
+    $(wildcard include/config/GENERIC_IOMAP) \
+    $(wildcard include/config/TRACE_MMIO_ACCESS) \
+    $(wildcard include/config/GENERIC_IOREMAP) \
+  include/linux/logic_pio.h \
+    $(wildcard include/config/INDIRECT_PIO) \
+  include/linux/fwnode.h \
+  include/linux/vmalloc.h \
+    $(wildcard include/config/KASAN_VMALLOC) \
+    $(wildcard include/config/HAVE_ARCH_HUGE_VMALLOC) \
+  arch/arm/include/asm/vmalloc.h \
+  include/linux/slab.h \
+    $(wildcard include/config/FAILSLAB) \
+    $(wildcard include/config/KFENCE) \
+    $(wildcard include/config/SLUB_TINY) \
+    $(wildcard include/config/SLUB_DEBUG) \
+  include/linux/percpu-refcount.h \
+  include/linux/hash.h \
+    $(wildcard include/config/HAVE_ARCH_HASH) \
+  include/linux/kasan.h \
+    $(wildcard include/config/KASAN_STACK) \
+  include/linux/kasan-enabled.h \
+  include/linux/kasan-tags.h \
+  arch/arm/include/generated/asm/irq_regs.h \
+  include/asm-generic/irq_regs.h \
+  include/linux/irqdesc.h \
+    $(wildcard include/config/GENERIC_IRQ_DEBUGFS) \
+    $(wildcard include/config/IRQ_DOMAIN) \
+  arch/arm/include/asm/hw_irq.h \
+  arch/arm/include/asm/sections.h \
+  include/asm-generic/sections.h \
+    $(wildcard include/config/HAVE_FUNCTION_DESCRIPTORS) \
   include/linux/delay.h \
   arch/arm/include/asm/delay.h \
-  include/linux/of.h \
-    $(wildcard include/config/OF_DYNAMIC) \
-    $(wildcard include/config/SPARC) \
-    $(wildcard include/config/OF_PROMTREE) \
-    $(wildcard include/config/OF_KOBJ) \
-    $(wildcard include/config/OF_NUMA) \
-    $(wildcard include/config/OF_OVERLAY) \
-  include/linux/mod_devicetable.h \
-  include/uapi/linux/mei.h \
-  include/uapi/linux/mei_uuid.h \
-  include/linux/uuid.h \
-  include/linux/property.h \
-  include/linux/fwnode.h \
   include/linux/fs.h \
     $(wildcard include/config/READ_ONLY_THP_FOR_FS) \
     $(wildcard include/config/FS_POSIX_ACL) \
@@ -845,8 +904,6 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
     $(wildcard include/config/ARCH_USE_CMPXCHG_LOCKREF) \
   include/linux/stringhash.h \
     $(wildcard include/config/DCACHE_WORD_ACCESS) \
-  include/linux/hash.h \
-    $(wildcard include/config/HAVE_ARCH_HASH) \
   include/linux/path.h \
   include/linux/list_lru.h \
   include/linux/shrinker.h \
@@ -871,7 +928,6 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
     $(wildcard include/config/STACK_GROWSUP) \
   include/linux/signal.h \
     $(wildcard include/config/DYNAMIC_SIGFRAME) \
-    $(wildcard include/config/PROC_FS) \
   include/linux/sched/jobctl.h \
   include/linux/sched/task.h \
     $(wildcard include/config/HAVE_EXIT_THREAD) \
@@ -911,6 +967,7 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
     $(wildcard include/config/RTC_CLASS) \
   include/linux/rcu_sync.h \
   include/linux/delayed_call.h \
+  include/linux/uuid.h \
   include/linux/errseq.h \
   include/linux/ioprio.h \
   include/linux/sched/rt.h \
@@ -920,17 +977,6 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
   include/linux/fs_types.h \
   include/linux/mount.h \
   include/linux/mnt_idmapping.h \
-  include/linux/slab.h \
-    $(wildcard include/config/FAILSLAB) \
-    $(wildcard include/config/KFENCE) \
-    $(wildcard include/config/SLUB_TINY) \
-    $(wildcard include/config/SLUB_DEBUG) \
-  include/linux/percpu-refcount.h \
-  include/linux/kasan.h \
-    $(wildcard include/config/KASAN_STACK) \
-    $(wildcard include/config/KASAN_VMALLOC) \
-  include/linux/kasan-enabled.h \
-  include/linux/kasan-tags.h \
   include/linux/rw_hint.h \
   include/uapi/linux/fs.h \
   include/linux/quota.h \
@@ -942,6 +988,17 @@ deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o := \
   include/linux/projid.h \
   include/uapi/linux/quota.h \
   include/linux/cdev.h \
+  include/linux/of.h \
+    $(wildcard include/config/OF_DYNAMIC) \
+    $(wildcard include/config/SPARC) \
+    $(wildcard include/config/OF_PROMTREE) \
+    $(wildcard include/config/OF_KOBJ) \
+    $(wildcard include/config/OF_NUMA) \
+    $(wildcard include/config/OF_OVERLAY) \
+  include/linux/mod_devicetable.h \
+  include/uapi/linux/mei.h \
+  include/uapi/linux/mei_uuid.h \
+  include/linux/property.h \
 
 /home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o: $(deps_/home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.o)
 

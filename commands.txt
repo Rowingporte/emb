@@ -112,3 +112,5 @@ mknod /dev/hcsr04 c 245 0
 chmod 666 /dev/hcsr04
 
 scp output/images/stm32mp157c-dk2.dtb root@10.42.0.16:/boot/
+
+cp /home/arno/insa/4A/emb/buildroot-2025.02.7/package/HCSR04/HCSR04.ko output/target/lib/modules/6.9.8/updates/
