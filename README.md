@@ -1,5 +1,29 @@
-Système de Mesure de Distance Ultrason (HC-SR04)Ce projet consiste en l'implémentation d'un système embarqué complet sous Linux (Buildroot) sur une carte STM32MP157. Il permet de mesurer une distance via un capteur HC-SR04, de traiter la donnée dans le Kernel Space pour garantir précision et sécurité, et de visualiser les résultats (moyenne, écart-type, distribution de Gauss) sur une interface web déportée.🚀 FonctionnalitésDriver Kernel (C) : Pilotage du capteur HC-SR04 via les GPIOs (PA11/PA12) et gestion précise du temps.Interface FS : Lecture de la distance directement depuis le système de fichiers (/dev/hc_sr04).Accès Sécurisé : Restriction de l'accès aux mesures via les permissions Linux.Dashboard Statistique : Interface web interactive affichant :La distance en temps réel.Une jauge de proximité dynamique (couleurs alertes).Une courbe de Gauss générée sur les 1000 dernières mesures pour analyser la stabilité du capteur.🛠️ Architecture MatérielleLe capteur est relié au connecteur Arduino de la STM32MP157 :VCC : 5VGND : GroundTRIG (Déclenchement) : GPIO PA12 (Configuré en sortie)ECHO (Retour) : GPIO PA11 (Configuré en entrée avec interruption)💻 Implémentation Logicielle1. Kernel Space (Le Driver)Le driver est implémenté comme un Platform Driver. Il utilise le Device Tree pour récupérer les ressources GPIO.Précision : Utilisation des fonctions ktime_get pour une précision à la microseconde.Sécurité : L'accès au hardware est encapsulé dans le noyau, exposant uniquement la valeur finale à l'espace utilisateur via copy_to_user.2. Interface Web & StatistiquesL'affichage déporté récupère les données du driver. Pour valider la fiabilité du capteur, nous appliquons la loi normale (Distribution Gaussienne) :$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$Moyenne ($\mu$) : Représente la distance réelle mesurée.Écart-type ($\sigma$) : Mesure la dispersion (le bruit) du capteur. Plus la courbe est étroite, plus le driver est précis.Shutterstock📦 InstallationConfiguration BuildrootIntégrer le fichier DTS personnalisé dans board/insa/see/.Activer libgpiod dans make menuconfig.Compiler l'image : make.Déploiement du DriverBashinsmod hc_sr04.ko
-# Vérifier la création du device
-ls -l /dev/hc_sr04
-Lancement du DashboardBash# Lancer le serveur (Django/Flask)
-python manage.py runserver 0.0.0.0:8000
+Projet SEE : Système de Mesure de Distance via HC-SR04Ce projet implémente un système complet de mesure de distance ultrasonique sur une cible STM32MP157 exploitant la distribution Buildroot. 
+
+L'architecture repose sur un driver noyau (Kernel Space) pour l'acquisition précise des données et un tableau de bord web pour l'analyse statistique en temps réel.
+
+1. Objectifs du Projet
+
+Kernel Space : Pilotage du capteur via un module noyau Linux dédié pour garantir sécurité, isolation et réactivité.
+
+Précision Temporelle : Utilisation d'interruptions et de ktime pour minimiser la gigue (jitter) lors de la mesure de l'écho.
+
+Analyse Statistique : Modélisation de la fiabilité du capteur par une distribution normale (Gaussienne) calculée sur une fenêtre glissante.
+
+4. Architecture TechniqueA. Couche Matérielle et Device TreeLe capteur HC-SR04 est interfacé avec la STM32MP1 via les connecteurs Arduino :TRIGGER : GPIO PA12 (Configuré en sortie).ECHO : GPIO PA11 (Configuré en entrée avec support d'interruption).
+
+Le Device Tree (.dts) a été modifié pour déclarer ces broches et permettre au driver de les revendiquer dynamiquement au chargement.
+
+Conversion du temps en distance.
+
+Transmission sécurisée de la donnée vers l'espace utilisateur via copy_to_user.C. 
+
+Dashboard Web et Statistiques
+
+L'interface frontend traite les données reçues pour fournir une analyse métrologique :
+
+Traitement du Bruit : Calcul de la moyenne et de l'écart-type sur les 1000 derniers échantillons.
+
+Visualisation Gaussienne : Génération d'une courbe de Gauss dynamique pour évaluer la dispersion des mesures. 
+
+Une courbe étroite valide la précision de l'implémentation noyau.Alertes de Proximité : Jauge dynamique avec seuils de sécurité (Bleu / Orange / Rouge).
