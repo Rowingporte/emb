@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesure HC-SR04</title>
+    <title>Mesure HC-SR04 & Distribution</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             background-color: #0d1117;
@@ -15,36 +17,33 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
 
         .container {
             text-align: center;
             background: #161b22;
-            padding: 50px;
+            padding: 40px;
             border-radius: 30px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid #30363d;
-            width: 80%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 700px;
         }
 
         h1 {
             font-weight: 300;
             letter-spacing: 3px;
             color: #8b949e;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        
-        .value-container {
             margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
         }
 
         #dist-val {
-            font-size: 8rem;
+            font-size: 6rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
             color: #ffffff;
@@ -52,37 +51,48 @@
         }
 
         .unit {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #58a6ff;
             margin-left: 10px;
         }
 
-  
         .gauge-track {
-            height: 40px;
+            height: 20px;
             width: 100%;
             background: #010409;
-            border-radius: 20px;
+            border-radius: 10px;
             overflow: hidden;
-            border: 2px solid #30363d;
-            position: relative;
+            border: 1px solid #30363d;
+            margin: 20px 0;
         }
 
         #gauge-bar {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, #58a6ff, #00d4ff);
-            box-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
-            transition: width 0.3s ease-out, background 0.3s ease;
+            transition: width 0.3s ease-out;
         }
 
-       
+        .chart-wrapper {
+            margin-top: 30px;
+            height: 200px;
+            width: 100%;
+        }
+
         .alert-text {
-            margin-top: 20px;
+            margin-top: 15px;
             font-weight: bold;
-            height: 24px;
+            height: 20px;
             color: #ff7b72;
             visibility: hidden;
+        }
+
+        .stats-overlay {
+            font-size: 0.8rem;
+            color: #8b949e;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-around;
         }
     </style>
 </head>
@@ -100,58 +110,142 @@
         </div>
 
         <div id="alert" class="alert-text">ATTENTION : TROP PROCHE !</div>
+
+        <div class="chart-wrapper">
+            <canvas id="gaussianChart"></canvas>
+        </div>
+
+        <div class="stats-overlay">
+            <span id="stat-mean">Moyenne: --</span>
+            <span id="stat-std">Écart-type: --</span>
+        </div>
     </div>
 
     <script>
-        function fetchDistance() {
-        fetch("{% url 'data' %}")
-            .then(response => response.json())
-            .then(data => {
-                const dist = parseFloat(data.dist1);
-                const valElement = document.getElementById('dist-val');
-                const bar = document.getElementById('gauge-bar');
-                const alertMsg = document.getElementById('alert');
+        // Configuration & State
+        let distanceHistory = [];
+        const MAX_SAMPLES = 100;
+        let myChart;
 
-                valElement.innerText = Math.round(dist);
-
-                // --- INVERSION DE LA LOGIQUE ---
-                // Si dist = 0, percent = 100% (Barre pleine)
-                // Si dist = 150, percent = 0% (Barre vide)
-                let percent = 100 - ((dist / 150) * 100);
-                
-                // Sécurité pour rester entre 0 et 100
-                percent = Math.min(Math.max(percent, 0), 100);
-                bar.style.width = percent + "%";
-
-                // --- COULEURS SELON LA PROXIMITÉ ---
-                if (dist < 20) {
-                    // Très proche : Rouge
-                    bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
-                    bar.style.boxShadow = "0 0 20px rgba(248, 81, 73, 0.6)";
-                    alertMsg.style.visibility = "visible";
-                } else if (dist < 80) {
-                    // Approche : Orange/Jaune
-                    bar.style.background = "linear-gradient(90deg, #d29922, #e3b341)";
-                    bar.style.boxShadow = "none";
-                    alertMsg.style.visibility = "hidden";
-                } else {
-                    // Loin : Bleu
-                    bar.style.background = "linear-gradient(90deg, #58a6ff, #00d4ff)";
-                    bar.style.boxShadow = "0 0 20px rgba(88, 166, 255, 0.4)";
-                    alertMsg.style.visibility = "hidden";
+        // Initialize the Chart
+        function initChart() {
+            const ctx = document.getElementById('gaussianChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Distribution Normale',
+                        data: [],
+                        borderColor: '#58a6ff',
+                        backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { 
+                            grid: { color: '#30363d' },
+                            ticks: { color: '#8b949e', maxTicksLimit: 10 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
                 }
-            })
-            .catch(err => {
-                console.error("Erreur :", err);
-                document.getElementById('dist-val').innerText = "??";
             });
         }
 
-        
-        setInterval(fetchDistance, 250);
-        
-        
-        window.onload = fetchDistance;
+        // Statistical Math: Gaussian PDF
+        function normalPDF(x, mean, stdDev) {
+            return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
+        }
+
+        function updateGaussian(dataArray) {
+            if (dataArray.length < 5) return;
+
+            // 1. Calculate Mean
+            const n = dataArray.length;
+            const mean = dataArray.reduce((a, b) => a + b) / n;
+
+            // 2. Calculate Standard Deviation
+            const stdDev = Math.sqrt(dataArray.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n) || 0.1;
+
+            // Update UI Stats
+            document.getElementById('stat-mean').innerText = `Moyenne: ${mean.toFixed(2)} cm`;
+            document.getElementById('stat-std').innerText = `σ: ${stdDev.toFixed(2)}`;
+
+            // 3. Generate Curve Points (Mean +/- 4 StdDev)
+            const labels = [];
+            const points = [];
+            const start = mean - (4 * stdDev);
+            const end = mean + (4 * stdDev);
+            const step = (8 * stdDev) / 50; // 50 points for smoothness
+
+            for (let i = start; i <= end; i += step) {
+                labels.push(i.toFixed(1));
+                points.push(normalPDF(i, mean, stdDev));
+            }
+
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = points;
+            myChart.update('none'); 
+        }
+
+        function fetchDistance() {
+            fetch("{% url 'data' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const dist = parseFloat(data.dist1);
+                    const valElement = document.getElementById('dist-val');
+                    const bar = document.getElementById('gauge-bar');
+                    const alertMsg = document.getElementById('alert');
+
+                    // Update Text
+                    valElement.innerText = Math.round(dist);
+
+                    // Update History for Gaussian
+                    distanceHistory.push(dist);
+                    if (distanceHistory.length > MAX_SAMPLES) distanceHistory.shift();
+                    updateGaussian(distanceHistory);
+
+                    // Gauge Percentage (0-150 range)
+                    let percent = 100 - ((dist / 150) * 100);
+                    percent = Math.min(Math.max(percent, 0), 100);
+                    bar.style.width = percent + "%";
+
+                    // Color Logic
+                    if (dist < 20) {
+                        bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
+                        alertMsg.style.visibility = "visible";
+                    } else if (dist < 80) {
+                        bar.style.background = "linear-gradient(90deg, #d29922, #e3b341)";
+                        alertMsg.style.visibility = "hidden";
+                    } else {
+                        bar.style.background = "linear-gradient(90deg, #58a6ff, #00d4ff)";
+                        alertMsg.style.visibility = "hidden";
+                    }
+                })
+                .catch(err => {
+                    console.error("Erreur :", err);
+                    document.getElementById('dist-val').innerText = "??";
+                });
+        }
+
+        // Execution
+        window.onload = () => {
+            initChart();
+            fetchDistance();
+            setInterval(fetchDistance, 250);
+        };
     </script>
 </body>
 </html>
