@@ -27,16 +27,21 @@ static struct hcsr04_data *global_data = NULL;
 static irqreturn_t hcsr04_echo_isr(int irq, void *dev_id) {
     struct hcsr04_data *data = dev_id;
     int val = gpiod_get_value(data->echo_gpio);
+    ktime_t now = ktime_get();
 
     if (val == 1) {
-        printk(KERN_INFO "HCSR04: Front MONTANT détecté\n");
-        data->start_time = ktime_get();
+        // On ne démarre le chrono QUE si on n'est pas déjà en attente d'un écho
+        if (data->data_ready == false) {
+            data->start_time = now;
+        }
     } else {
-        printk(KERN_INFO "HCSR04: Front DESCENDANT détecté\n");
-        ktime_t end_time = ktime_get();
-        data->last_delta_ns = ktime_to_ns(ktime_sub(end_time, data->start_time));
-        data->data_ready = true;
-        wake_up_interruptible(&data->wq);
+        // On ne calcule que si on a un début de mesure valide
+        if (ktime_to_ns(data->start_time) > 0) {
+            data->last_delta_ns = ktime_to_ns(ktime_sub(now, data->start_time));
+            data->start_time = ktime_set(0, 0); // Reset
+            data->data_ready = true;
+            wake_up_interruptible(&data->wq);
+        }
     }
     return IRQ_HANDLED;
 }
