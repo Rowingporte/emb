@@ -164,7 +164,6 @@
             });
         }
 
-        // Statistical Math: Gaussian PDF
         function normalPDF(x, mean, stdDev) {
             return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
         }
@@ -172,23 +171,19 @@
         function updateGaussian(dataArray) {
             if (dataArray.length < 5) return;
 
-            // 1. Calculate Mean
             const n = dataArray.length;
             const mean = dataArray.reduce((a, b) => a + b) / n;
 
-            // 2. Calculate Standard Deviation
             const stdDev = Math.sqrt(dataArray.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n) || 0.1;
 
-            // Update UI Stats
             document.getElementById('stat-mean').innerText = `Moyenne: ${mean.toFixed(2)} cm`;
             document.getElementById('stat-std').innerText = `σ: ${stdDev.toFixed(2)}`;
 
-            // 3. Generate Curve Points (Mean +/- 4 StdDev)
             const labels = [];
             const points = [];
             const start = mean - (4 * stdDev);
             const end = mean + (4 * stdDev);
-            const step = (8 * stdDev) / 50; // 50 points for smoothness
+            const step = (8 * stdDev) / 50;
 
             for (let i = start; i <= end; i += step) {
                 labels.push(i.toFixed(1));
@@ -209,20 +204,16 @@
                     const bar = document.getElementById('gauge-bar');
                     const alertMsg = document.getElementById('alert');
 
-                    // Update Text
                     valElement.innerText = Math.round(dist);
 
-                    // Update History for Gaussian
                     distanceHistory.push(dist);
                     if (distanceHistory.length > MAX_SAMPLES) distanceHistory.shift();
                     updateGaussian(distanceHistory);
 
-                    // Gauge Percentage (0-150 range)
                     let percent = 100 - ((dist / 150) * 100);
                     percent = Math.min(Math.max(percent, 0), 100);
                     bar.style.width = percent + "%";
 
-                    // Color Logic
                     if (dist < 20) {
                         bar.style.background = "linear-gradient(90deg, #ff7b72, #f85149)";
                         alertMsg.style.visibility = "visible";
@@ -240,7 +231,6 @@
                 });
         }
 
-        // Execution
         window.onload = () => {
             initChart();
             fetchDistance();
