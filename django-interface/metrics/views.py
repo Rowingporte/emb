@@ -27,7 +27,7 @@ def data(request):
             except ValueError:
                 return JsonResponse({'error': f'Invalid data format: {raw_val}'}, status=500)
             
-             obj = Mesure.objects.create(dist1=dist)
+            obj = Mesure.objects.create(dist1=dist)
             return JsonResponse({'id': obj.id, 'dist1': dist, 'from': addr[0]})
 
     except socket.timeout:
